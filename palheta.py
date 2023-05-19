@@ -22,7 +22,7 @@ class Palheta:
 
     def movimento(self, yFac):
         self.posy = self.posy + self.speed * yFac
-        print(self.posy, self.posx, self.speed, "print")
+        
         if self.posy <= 0:
             self.posy = 0
         elif self.posy + self.height >= HEIGHT:

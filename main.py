@@ -15,6 +15,11 @@ pygame.display.set_caption("Pong")
 clock = pygame.time.Clock()
 FPS = 30
 
+def draw(text,x, y, color):
+        text = fonte.render(text, True, color)
+        textRect = text.get_rect()
+        textRect.center = (x, y)
+        tela.blit(text, textRect)
 
 def main():
     running = True
@@ -27,50 +32,68 @@ def main():
 
     jog1Score, jog2Score = 0, 0
     jog1YFac, jog2YFac = 0, 0
+
+    escolha = ""
     while running:
 
         tela.fill(BLACK)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    jog2YFac = -1
-                if event.key == pygame.K_DOWN:
-                    jog2YFac = 1
-                if event.key == pygame.K_w:
-                    jog1YFac = -1
-                if event.key == pygame.K_s:
-                    jog1YFac = 1
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                    jog2YFac = 0
-                if event.key == pygame.K_w or event.key == pygame.K_s:
-                    jog1YFac = 0
+        draw("Pong", 400, 50, WHITE)
+        
+        draw("Multi Player",400,300, WHITE)
+        draw("Single Player",400,350, WHITE)
+        draw("Treinar IA", 400, 400, WHITE)
+        
+        if pygame.mouse.get_pressed():
+            if pygame.mouse.get_pos() == (400, 300):
+                escolha = "multiplayer"
+            pygame.display.update()
+        while escolha == "2":
+            pygame.display.update()
+            tela.fill(BLACK)
+            print(pygame.mouse.get_pos())
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        jog2YFac = -1
+                    if event.key == pygame.K_DOWN:
+                        jog2YFac = 1
+                    if event.key == pygame.K_w:
+                        jog1YFac = -1
+                    if event.key == pygame.K_s:
+                        jog1YFac = 1
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        jog2YFac = 0
+                    if event.key == pygame.K_w or event.key == pygame.K_s:
+                        jog1YFac = 0
 
-            for jogador in jogadores:
-                if pygame.Rect.colliderect(bola.getRect(), jogador.getRect()):
-                    bola.colisao()
+                for jogador in jogadores:
+                    if pygame.Rect.colliderect(bola.getRect(), jogador.getRect()):
+                        bola.colisao()
 
-        jog1.movimento(jog1YFac)
-        jog2.movimento(jog2YFac)
-        ponto = bola.update()
+            jog1.movimento(jog1YFac)
+            jog2.movimento(jog2YFac)
+            ponto = bola.update()
 
-        if ponto == -1:
-            jog1Score += 1
-            bola.reset()
-        elif ponto == 1:
-            jog2Score += 1
-            bola.reset()
+            if ponto == -1:
+                jog1Score += 1
+                bola.reset()
+            elif ponto == 1:
+                jog2Score += 1
+                bola.reset()
 
-        jog1.display()
-        jog2.display()
-        bola.display()
-        jog1.drawPlacar("Jogador 1 : ", jog1Score, 100, 20, WHITE)
-        jog2.drawPlacar("Jogador 2 : ", jog2Score, WIDTH - 100, 20, WHITE)
+            jog1.display()
+            jog2.display()
+            bola.display()
+            jog1.drawPlacar("Jogador 1 : ", jog1Score, 100, 20, WHITE)
+            jog2.drawPlacar("Jogador 2 : ", jog2Score, WIDTH - 100, 20, WHITE)
+            pygame.display.update()
+            clock.tick(FPS)
+        
         pygame.display.update()
-        # Adjusting the frame rate
         clock.tick(FPS)
 
 
