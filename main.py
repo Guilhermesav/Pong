@@ -33,25 +33,68 @@ def main():
     jog1Score, jog2Score = 0, 0
     jog1YFac, jog2YFac = 0, 0
 
-    escolha = ""
+    escolha = "1"
     while running:
 
-        tela.fill(BLACK)
+        while escolha == "0":
+            tela.fill(BLACK)
 
-        draw("Pong", 400, 50, WHITE)
+            draw("Pong", 400, 50, WHITE)
+            
+            draw("Multi Player",400,300, WHITE)
+            draw("Single Player",400,350, WHITE)
+            draw("Treinar IA", 400, 400, WHITE)
         
-        draw("Multi Player",400,300, WHITE)
-        draw("Single Player",400,350, WHITE)
-        draw("Treinar IA", 400, 400, WHITE)
+            if pygame.mouse.get_pressed():
+                if pygame.mouse.get_pos() == (400, 300):
+                    escolha = "multiplayer"
+                pygame.display.update()
         
-        if pygame.mouse.get_pressed():
-            if pygame.mouse.get_pos() == (400, 300):
-                escolha = "multiplayer"
+        while escolha ==  "1":
             pygame.display.update()
+            tela.fill(BLACK)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        jog2YFac = -1
+                    if event.key == pygame.K_DOWN:
+                        jog2YFac = 1
+                    if event.key == pygame.K_w:
+                        jog1YFac = -1
+                    if event.key == pygame.K_s:
+                        jog1YFac = 1
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        jog2YFac = 0
+                    if event.key == pygame.K_w or event.key == pygame.K_s:
+                        jog1YFac = 0
+            for jogador in jogadores:
+                    if pygame.Rect.colliderect(bola.getRect(), jogador.getRect()):
+                        bola.colisao()
+                    
+                        
+           
+            jog1.movimento(jog1YFac)
+            ponto = bola.updateTreino()
+
+            if ponto == -1:
+                jog1Score += 1
+                bola.resetTreino()
+            elif ponto == 1:
+                jog2Score += 1
+                bola.reset()
+
+            jog1.drawPlacar("Jogador 1 : ", jog1Score, 100, 20, WHITE)
+            jog1.display()
+            bola.display()
+            pygame.display.update()
+            clock.tick(FPS)
+
         while escolha == "2":
             pygame.display.update()
             tela.fill(BLACK)
-            print(pygame.mouse.get_pos())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -77,7 +120,6 @@ def main():
             jog1.movimento(jog1YFac)
             jog2.movimento(jog2YFac)
             ponto = bola.update()
-
             if ponto == -1:
                 jog1Score += 1
                 bola.reset()
