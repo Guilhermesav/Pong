@@ -19,7 +19,7 @@ class AlgGenet():
 
     def criar_pop(self,tam_pop):
         for x in range(tam_pop):
-            palheta = Palheta(20, 0, 10, 100, 7, WHITE,0,numpy.random.uniform(-1,1,3),numpy.random.uniform(-1,1,1))
+            palheta = Palheta(WHITE,0,numpy.random.uniform(-1,1,5),numpy.random.uniform(-1,1,1))
             self.palhetas.append(palheta)
              
     def select_pais(self):
@@ -50,14 +50,16 @@ class AlgGenet():
     def crossover(self,pai,mae):
         filho_ent = numpy.mean([pai.genom_ent,mae.genom_ent],axis=0)
         filho_ext = numpy.mean([pai.genom_ext,mae.genom_ext],axis=0)
-        palheta = Palheta(20, 0, 10, 100, 7, WHITE,0,filho_ent,filho_ext)
+        palheta = Palheta(WHITE,0,filho_ent,filho_ext)
+
+        print(palheta.fitness)
         return palheta
     
     def mutacao(self, palheta):
-        palheta.genom_ent = numpy.random.uniform(-1,1,3)
+        palheta.genom_ent = numpy.random.uniform(-1,1,5)
         palheta.genom_ext = numpy.random.uniform(-1,1,1)    
         
-    def jogo(self,bola,geracao):
+    def jogo(self,bola,geracao,best_fit):
         reserva = self.palhetas.copy()
         for palheta in self.palhetas:
             rn = RN(3,6,1,palheta.genom_ent,palheta.genom_ext)
@@ -69,14 +71,13 @@ class AlgGenet():
                 palheta.drawPlacar("Fitness: ", palheta.fitness, 100, 20, WHITE)
                 palheta.drawPlacar("Geração: ", geracao, 300, 20, WHITE)
                 palheta.drawPlacar("Individuo:  ", self.palhetas.index(palheta), 500, 20, WHITE)
-                
+                palheta.drawPlacar("Melhor Fit:  ", best_fit, 650, 20, WHITE)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
-                for jogador in self.palhetas:
-                    if pygame.Rect.colliderect(bola.getRect(), jogador.getRect()):
-                        palheta.fitness += 500
-                        bola.colisao()
+                if pygame.Rect.colliderect(bola.getRect(), palheta.getRect()):
+                    palheta.fitness += 300
+                    bola.colisao()
                 
               
                 palheta.segue_bola(rn,bola)
@@ -88,31 +89,35 @@ class AlgGenet():
                 elif ponto == 1: #esquerda
                     reserva.remove(palheta)
                     bola.reset()
+                    pygame.display.update()
                     break
-
-                pygame.display.update()
                 clock.tick(FPS)
                 palheta.fitness +=1
-            
-        
+
+                        
     def treino(self):
-       bola = Bola(WIDTH // 2, HEIGHT // 2, 7, 10, WHITE)
-       self.criar_pop(20)
+       bola = Bola(WIDTH // 2, HEIGHT // 2, 7, WHITE)
+       self.criar_pop(10)
+       best_fit = 0
        for x in range(50):
-           self.jogo(bola,x)
+           self.jogo(bola,x,best_fit)
            new_gen = []
            top_percentual = int((20 * len(self.palhetas))/100)
            self.palhetas.sort(key=lambda palheta: palheta.fitness,reverse= True)
-           new_gen = self.palhetas[:top_percentual]
+           if self.palhetas[0].fitness > best_fit:
+            best_fit = self.palhetas[0].fitness
+           for x in self.palhetas[:top_percentual] :
+               new_gen.append(Palheta(WHITE,0,x.genom_ent,x.genom_ext))
            while len(new_gen) < len(self.palhetas):
-               pais = self.select_pais()
-               filho = self.crossover(pais[0],pais[1])
-               if random.random() < 0.5:
-                  self.mutacao(filho)
-               new_gen.append(filho)
+                pais = self.select_pais()
+                filho = self.crossover(pais[0],pais[1])
+                if random.random() < 0.2:
+                    self.mutacao(filho)
+                new_gen.append(filho)
            self.palhetas = new_gen
        print(self.palhetas)
-
+# melhor peso atual:array([-0.15273317, -0.15867392, -0.01781071,  0.71855971,  0.26231887])
+# melhor peso atual:array([0.95256012])
 if __name__ == "__main__":
     game = AlgGenet()
     game.treino()    

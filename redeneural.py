@@ -14,9 +14,9 @@ class RN:
         self.peso2 = peso2
             
     def feed_foward(self, input):
-        hidden_lay = self.relu(numpy.dot(input, self.peso1))
+        dot = numpy.dot(input, self.peso1)
+        hidden_lay = self.relu(dot)
         tam_output = self.sigmoid(numpy.dot(hidden_lay, self.peso2))
-        print(tam_output)
         return tam_output
 
     def relu(self, x):
